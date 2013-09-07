@@ -56,4 +56,8 @@ public class CUUnoUseCaseModel extends AdminBaseUseCaseModel{
   }
 
 }
+
 ```
+
+See [sisopadmin](https://github.com/lzungri/sisopadmin) project for a real-world example of easy-struts.
+
