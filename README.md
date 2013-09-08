@@ -82,7 +82,24 @@ public class CRUDUserUseCaseModel extends ABMBaseUseCaseModel {
       }
     }
   }
+  
+  // The user selects the entities from the list and then accepts the use case.
 
+}
+
+
+public class AppUseCaseRegister extends UseCaseRegister {
+
+  public void registerUseCases(UseCaseRegistry useCaseRegistry) {
+    useCaseRegistry
+      .registerUseCases(
+        new CompositeRegistryElement("Tests")
+          .addUseCase(new FirstUseCase())
+          .addUseCase(new CRUDUserUseCase())
+      )
+      .registerUseCase(new HomeUseCase());
+  }
+  
 }
 
 ```
