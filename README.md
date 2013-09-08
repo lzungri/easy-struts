@@ -7,7 +7,7 @@ It allows you to do the following:
 
 ```java
 
-public class FirstUseCase extends AdminBaseUseCase {
+public class FirstUseCase extends BaseUseCase {
 
   public Class useCaseModelClass() {
     return FirstUseCaseModel.class;
@@ -29,21 +29,22 @@ public class FirstUseCase extends AdminBaseUseCase {
 
 public class FirstUseCaseModel extends BaseUseCaseModel{
 
-  // Automatically invoked from the jsp after user interaction
+  // Automatically invoked when the user clicks on the 'Select users' button
   public void goToSelectUsersUseCase(UseCaseContext context) {
     Map parameters = CollectionFactory.createMap();
-    parameters.put("userFilter1", "value1");
-    parameters.put("userFilter2", "value2");
+    Calendar calendar = Calendar.getInstance();
+    calendar.add(Calendar.DAY_OF_MONTH, -10);
+    parameters.put("userCreationDateBefore", calendar.getTime());
 
+    context.addMessage("Please select a user from the following list:");
     context.goToChildUseCase(CRUDUserUseCase.class, new SelectionMode(), "returnFromSelection");
   }
 
   public void returnFromSelection(UseCaseContext context) {
     CRUDUserUseCaseModel model = (CRUDUserUseCaseModel) context.getReturnedModel();
     
-    for(ModelObject selectedEntity : model.getSelectedEntities()) {
-      User user = (User) selectedEntity;
-      context.addMessage(user.getUsername());
+    for(User selectedUser : model.getSelectedEntities()) {
+      context.addMessage("Selected user: " + selectedUse.getUsername());
     }
   }
 
@@ -72,11 +73,13 @@ public class CRUDUserUseCaseModel extends ABMBaseUseCaseModel {
     return User.class;
   }	
 
-  protected Predicate searchFilter(final Usuario loggedUser) {
+  protected Predicate searchFilter(final User loggedUser) {
     return new Predicate() {
       public boolean evaluate(Object object) {
-        InformeEvaluacionFase informe = (InformeEvaluacionFase) object;
-      return informe.getGrupoEvaluado().equals(loggedUser) && informe.getEstado().getDomainCode().equals(InformeEvaluacionFase.ESTADO_CODE_ENVIADA);
+        User user = (User) object;
+        Date date = context.getParameter("userCreationDateBefore");
+        return user.getFechaAlta().before(date);
+      }
     }
   }
 
