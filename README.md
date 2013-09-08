@@ -36,7 +36,7 @@ public class FirstUseCaseModel extends BaseUseCaseModel{
     calendar.add(Calendar.DAY_OF_MONTH, -10);
     parameters.put("userCreationDateBefore", calendar.getTime());
 
-    context.addMessage("Please select a user from the following list:");
+    context.addMessage("Please select a user from the list:");
     context.goToChildUseCase(CRUDUserUseCase.class, new SelectionMode(), "returnFromSelection");
   }
 
@@ -44,7 +44,7 @@ public class FirstUseCaseModel extends BaseUseCaseModel{
     CRUDUserUseCaseModel model = (CRUDUserUseCaseModel) context.getReturnedModel();
     
     for(User selectedUser : model.getSelectedEntities()) {
-      context.addMessage("Selected user: " + selectedUse.getUsername());
+      context.addMessage("Selected user: " + selectedUser.getUsername());
     }
   }
 
