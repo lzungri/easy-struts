@@ -6,53 +6,78 @@ MVC web framework based on struts 1.2.9 that provides an easy declarative way fo
 It allows you to do the following:
 
 ```java
-public class CUUnoUseCase extends AdminBaseUseCase {
+
+public class FirstUseCase extends AdminBaseUseCase {
 
   public Class useCaseModelClass() {
-    return CUUnoUseCaseModel.class;
+    return FirstUseCaseModel.class;
   }
 
   public String getShortDescription() {
-    return "Use case one";
+    return "First Use case";
   }
 
   public String getLongDescription() {
-    return "This is a long description for use case one";
+    return "This is a long description for the first use case";
+  }
+  
+  public boolean isVisibleOnMenu() {
+    return true;
   }
 
 }
 
-public class CUUnoUseCaseModel extends AdminBaseUseCaseModel{
-
-  protected Class<? extends ModelObject> entityClass() {
-    return Information.class;
-  }	
+public class FirstUseCaseModel extends BaseUseCaseModel{
 
   // Automatically invoked from the jsp after user interaction
-  public void goToUCOne(UseCaseContext context) {
-    context.goToChildUseCase(CUUnoUseCase.class, new SelectionMode(), "returnFromSelection");
+  public void goToSelectUsersUseCase(UseCaseContext context) {
+    Map parameters = CollectionFactory.createMap();
+    parameters.put("userFilter1", "value1");
+    parameters.put("userFilter2", "value2");
+
+    context.goToChildUseCase(CRUDUserUseCase.class, new SelectionMode(), "returnFromSelection");
   }
 
   public void returnFromSelection(UseCaseContext context) {
-    CUUnoUseCaseModel model = (CUUnoUseCaseModel) context.getReturnedModel();
-    if(model != null) {
-      for(ModelObject selectedEntity : model.getSelectedEntities()) {
-        context.addMessage(((Information) selectedEntity).getContent());
-      }
+    CRUDUserUseCaseModel model = (CRUDUserUseCaseModel) context.getReturnedModel();
+    
+    for(ModelObject selectedEntity : model.getSelectedEntities()) {
+      User user = (User) selectedEntity;
+      context.addMessage(user.getUsername());
     }
   }
 
-  // Automatically invoked from the jsp after user interaction
-  public void goToUCTwo(UseCaseContext context) {
-    Map parametros = CollectionFactory.createMap();
-    parametros.put("valor11", this.valor11);
-    parametros.put("valor12", this.valor12);
-  
-    context.goToChildUseCase(CUDosUseCase.class, new EditMode(), parametros, "returnFromUCTwo");
+}
+
+
+public class CRUDUserUseCase extends AdminBaseUseCase {
+
+  public Class useCaseModelClass() {
+    return CRUDUserUseCaseModel.class;
   }
 
-  public void returnFromUCTwo(UseCaseContext context) {
-    context.addElement("returnedFrom", "Use case 2");
+  public String getShortDescription() {
+    return "Create, read, update, delete users use case";
+  }
+
+  public boolean isVisibleOnMenu() {
+    return true;
+  }
+
+}
+
+public class CRUDUserUseCaseModel extends ABMBaseUseCaseModel {
+
+  protected Class<? extends ModelObject> entityClass() {
+    return User.class;
+  }	
+
+  protected Predicate searchFilter(final Usuario loggedUser) {
+    return new Predicate() {
+      public boolean evaluate(Object object) {
+        InformeEvaluacionFase informe = (InformeEvaluacionFase) object;
+      return informe.getGrupoEvaluado().equals(loggedUser) && informe.getEstado().getDomainCode().equals(InformeEvaluacionFase.ESTADO_CODE_ENVIADA);
+    }
   }
 
 }
